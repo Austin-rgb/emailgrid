@@ -1,0 +1,15 @@
+[package]
+name = "emailgrid"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+reqwest = { version = "0.12", features = ["json"] }   # enables .json() method
+serde = { version = "1.0", features = ["derive"] }    # enables #[derive(Serialize)]
+dotenvy = "0.15.7"
+sqlx = { version = "0.8.6", features = ["sqlite"] }
+tera = "1.20.1"
+serde_json = "1.0.149"
+async-trait = "0.1.89"
+moka = { version = "0.12.15", features = ["future"] }
+anyhow = "1.0.102"
