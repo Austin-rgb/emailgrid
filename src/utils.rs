@@ -71,6 +71,7 @@ impl Emails {
 }
 
 /// Builder for email content
+#[derive(Clone)]
 pub struct Builder {
     emails: Emails,
     tera: Arc<Tera>,
@@ -117,6 +118,7 @@ impl Builder {
     }
 }
 
+#[derive(Clone)]
 pub struct EmailingContext {
     sender: Arc<dyn Sender>,
     builder: Builder,
@@ -133,7 +135,7 @@ impl EmailingContext {
         let emails = Emails::new(pool);
         let builder = Builder::new(emails)?;
 
-        Ok(Self {
+       Ok( Self {
             sender,
             builder,
             default_sender,

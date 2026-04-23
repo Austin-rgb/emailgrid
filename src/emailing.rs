@@ -1,7 +1,7 @@
+use async_trait::async_trait;
 use reqwest::Client;
 use reqwest::Response;
 use serde::Serialize;
-use async_trait::async_trait;
 use std::env;
 
 #[derive(Serialize, Clone)]
@@ -32,7 +32,7 @@ pub trait Sender: Send + Sync {
     async fn send(&self, payload: &EmailPayload) -> SendResult;
 }
 
-pub struct Brevo(String);
+pub struct Brevo(pub String);
 
 impl Brevo {
     pub fn new() -> Result<Self, env::VarError> {
@@ -56,7 +56,7 @@ impl Sender for Brevo {
     }
 }
 
-pub struct Resend(String);
+pub struct Resend(pub String);
 
 impl Resend {
     pub fn new() -> Result<Self, env::VarError> {

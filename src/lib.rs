@@ -1,5 +1,5 @@
-mod utils;
 mod emailing;
+mod utils;
 
-pub use emailing::{EmailAddress, Sender};
+pub use emailing::{Brevo, EmailAddress, Resend, Sender};
 pub use utils::EmailingContext;
