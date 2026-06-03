@@ -21,7 +21,8 @@ pub struct EmailPayload {
     pub sender: EmailAddress,
     pub to: Vec<EmailAddress>,
     pub subject: String,
-    pub htmlContent: String,
+    #[serde(rename="htmlContent")]
+    pub html_content: String,
     pub attachments: Vec<Attachment>,
 }
 
@@ -90,7 +91,7 @@ impl Sender for Resend {
             from: format!("{} <{}>", payload.sender.name, payload.sender.email),
             to: payload.to.iter().map(|t| &t.email).collect(),
             subject: &payload.subject,
-            html: &payload.htmlContent,
+            html: &payload.html_content,
             attachments: payload
                 .attachments
                 .iter()
