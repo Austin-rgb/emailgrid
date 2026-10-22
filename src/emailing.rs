@@ -21,7 +21,7 @@ pub struct EmailPayload {
     pub sender: EmailAddress,
     pub to: Vec<EmailAddress>,
     pub subject: String,
-    #[serde(rename="htmlContent")]
+    #[serde(rename = "htmlContent")]
     pub html_content: String,
     pub attachments: Vec<Attachment>,
 }

@@ -1,6 +1,6 @@
-use std::sync::Arc;
-use anyhow::{Result};
+use anyhow::Result;
 use serde_json::Value;
+use std::sync::Arc;
 use tera::{Context, Tera};
 
 use crate::emailing::{Attachment, EmailAddress, EmailPayload, SendResult, Sender};
@@ -50,13 +50,10 @@ pub struct EmailingContext {
 }
 
 impl EmailingContext {
-    pub fn new(
-        sender: Arc<dyn Sender>,
-        default_sender: EmailAddress,
-    ) -> Result<Self> {
+    pub fn new(sender: Arc<dyn Sender>, default_sender: EmailAddress) -> Result<Self> {
         let builder = Builder::new()?;
 
-       Ok( Self {
+        Ok(Self {
             sender,
             builder,
             default_sender,
@@ -71,7 +68,12 @@ impl EmailingContext {
     }
 
     /// High-level API: does everything
-    pub async fn send(&self,email: String,  subject: String, message: String) -> Result<SendResult> {
+    pub async fn send(
+        &self,
+        email: String,
+        subject: String,
+        message: String,
+    ) -> Result<SendResult> {
         // 1. Build (resolve email + render template)
         let html = self.builder.build(subject.clone(), message).await?;
 
