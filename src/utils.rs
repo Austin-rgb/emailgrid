@@ -3,7 +3,7 @@ use serde_json::Value;
 use std::sync::Arc;
 use tera::{Context, Tera};
 
-use crate::emailing::{Attachment, EmailAddress, EmailPayload, SendResult, Sender};
+use super::emailing::{Attachment, EmailAddress, EmailPayload, SendResult, Sender};
 
 /// Builder for email content
 #[derive(Clone)]
@@ -33,6 +33,20 @@ impl Builder {
         // Build Tera context
         let mut context = Context::new();
         context.extend(Context::from_serialize(&data)?);
+
+        let env = |k: &str, d: &str| std::env::var(k).unwrap_or_else(|_| d.to_string());
+        context.insert("app_name", &env("APP_NAME", "Ferrumec"));
+        context.insert(
+            "reset_url_base",
+            &env("RESET_URL_BASE", "http://localhost:8080/reset-password"),
+        );
+        context.insert(
+            "magic_link_base",
+            &env(
+                "MAGIC_LINK_BASE",
+                "http://localhost:8080/api/auth/passwordless/confirm_link",
+            ),
+        );
 
         // Render template
         let rendered = self.tera.render(&template_name, &context)?;
