@@ -22,13 +22,13 @@ impl Builder {
         })
     }
 
-    /// Build email
-    pub async fn build(&self, subject: String, message: String) -> Result<String> {
+    /// Render the template `<template>.html` with the JSON object in `message`.
+    pub fn render(&self, template: &str, message: &str) -> Result<String> {
         // Parse JSON message
-        let data: Value = serde_json::from_str(&message)?;
+        let data: Value = serde_json::from_str(message)?;
 
         // Prepare template name
-        let template_name = format!("{}.html", subject);
+        let template_name = format!("{}.html", template);
 
         // Build Tera context
         let mut context = Context::new();
@@ -81,15 +81,30 @@ impl EmailingContext {
         self
     }
 
-    /// High-level API: does everything
+    /// High-level API: does everything. `subject` doubles as the template
+    /// name (`<subject>.html`); use [`send_templated`](Self::send_templated)
+    /// when the two should differ.
     pub async fn send(
         &self,
         email: String,
         subject: String,
         message: String,
     ) -> Result<SendResult> {
-        // 1. Build (resolve email + render template)
-        let html = self.builder.build(subject.clone(), message).await?;
+        self.send_templated(email, subject.clone(), subject, message)
+            .await
+    }
+
+    /// Like [`send`](Self::send), but renders `<template>.html` while using
+    /// `subject` verbatim as the email's subject line.
+    pub async fn send_templated(
+        &self,
+        email: String,
+        template: String,
+        subject: String,
+        message: String,
+    ) -> Result<SendResult> {
+        // 1. Build (render template)
+        let html = self.builder.render(&template, &message)?;
 
         // 2. Construct payload
         let payload = EmailPayload {
