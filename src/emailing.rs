@@ -7,7 +7,21 @@ use std::env;
 #[derive(Serialize, Clone)]
 pub struct EmailAddress {
     pub email: String,
+    /// Display name. Omitted from the JSON when empty: Brevo rejects an
+    /// empty `name` ("name is missing in to") but accepts no `name` at all.
+    #[serde(skip_serializing_if = "String::is_empty")]
     pub name: String,
+}
+
+impl EmailAddress {
+    /// `Name <email>` or just `email` when there is no display name.
+    pub fn formatted(&self) -> String {
+        if self.name.is_empty() {
+            self.email.clone()
+        } else {
+            format!("{} <{}>", self.name, self.email)
+        }
+    }
 }
 
 #[derive(Serialize, Clone)]
@@ -23,6 +37,9 @@ pub struct EmailPayload {
     pub subject: String,
     #[serde(rename = "htmlContent")]
     pub html_content: String,
+    /// Brevo expects `{url|content, name}` here, not `{path, filename}`, so
+    /// the field is left out when empty rather than sent in a shape it rejects.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub attachments: Vec<Attachment>,
 }
 
@@ -88,7 +105,7 @@ impl Sender for Resend {
         let key = self.0.clone();
 
         let rp = ResendPayload {
-            from: format!("{} <{}>", payload.sender.name, payload.sender.email),
+            from: payload.sender.formatted(),
             to: payload.to.iter().map(|t| &t.email).collect(),
             subject: &payload.subject,
             html: &payload.html_content,
